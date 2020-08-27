@@ -1,0 +1,532 @@
+package com.narrowstudio.blackit.views.UI;
+
+import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.graphics.PixelFormat;
+import android.graphics.Point;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextClock;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+
+import com.narrowstudio.blackit.R;
+import com.narrowstudio.blackit.viewmodels.SettingsViewModel;
+
+import java.util.ArrayList;
+
+public class FloatingViewService extends Service {
+
+    public static final String CHANNEL_ID = "ForegroundServiceChannel";
+
+    private View mBlackScreen, fullScreen, floatingIcon;
+    private WindowManager mWindowManager;
+    final WindowManager.LayoutParams params = show();
+    private int unlockMode = 0, screenMode = 0, clicked = 0, floatingSize = 0;
+    private int doubleClickTime = 500, knockClickTime = 500;
+    private ArrayList<Integer> knockCode = new ArrayList<>();
+    private ArrayList<Integer> knockSeq = new ArrayList<>();
+    private boolean wasBoxClicked = false;
+    private long startTime = 0,millis;
+    private int millisSet=500;
+    private View box0, box1, box2, box3;
+    private TextClock mClock, mClock2, mDate;
+    private boolean isClock, isBrightness, isButtons, isFloating, isFloatingTurnedOn;
+    private ImageView floatingIconIV;
+    private int prevX = 20, prevY = 70;
+
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            millis = System.currentTimeMillis() - startTime;
+            int millisInt = (int) millis;
+            if (millisInt > millisSet) {
+                if (!wasBoxClicked) {
+                    knockSeq.clear();
+                    timerHandler.removeCallbacks(timerRunnable);
+                } else {
+                    wasBoxClicked = false;
+                    startTime = System.currentTimeMillis();
+                    timerHandler.post(timerRunnable);
+                }
+            }
+            timerHandler.postDelayed(this, 50);
+        }
+    };
+
+    public FloatingViewService(){
+
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        createNotificationChannel();
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Notification notification = new NotificationCompat.Builder(this, getResources().getString(R.string.service_channel))
+                .setContentText(getString(R.string.service_context))
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setNotificationSilent()
+                .setContentIntent(pendingIntent)
+                .build();
+        startForeground(1, notification);
+
+
+
+
+        Bundle mBundle = intent.getExtras();
+        unlockMode = mBundle.getInt("unlock");
+        screenMode = mBundle.getInt("screen");
+        isClock = mBundle.getBoolean("clock", true);
+        isBrightness = mBundle.getBoolean("brightness", false);
+        isButtons = mBundle.getBoolean("buttons", true);
+        isFloatingTurnedOn = mBundle.getBoolean("floating", false);
+        windowSetup();
+        if (!isFloatingTurnedOn){
+            deactivateFullScreen();
+        }
+        return Service.START_STICKY;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        //mSettingsViewModel = ViewModelProviders.of((FragmentActivity) FloatingViewService.this.getApplicationContext()).get(SettingsViewModel.class);
+        //mSettingsViewModel = new ViewModelProvider(FloatingViewService.this.getApplicationContext()).get(SettingsViewModel.class);
+        mBlackScreen = LayoutInflater.from(this).inflate(R.layout.layout_floating_screen, null);
+
+
+
+    }
+
+
+    private void windowSetup(){
+        isFloating = isFloatingTurnedOn;
+
+        mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        mWindowManager.addView(mBlackScreen, params);
+        mWindowManager.updateViewLayout(mBlackScreen, params);
+
+        fullScreen = mBlackScreen.findViewById(R.id.fs_full_screen);
+        box0 = mBlackScreen.findViewById(R.id.fs_window_0);
+        box1 = mBlackScreen.findViewById(R.id.fs_window_1);
+        box2 = mBlackScreen.findViewById(R.id.fs_window_2);
+        box3 = mBlackScreen.findViewById(R.id.fs_window_3);
+
+        floatingIcon = mBlackScreen.findViewById(R.id.fs_collapsed);
+
+        floatingIconIV = (ImageView) mBlackScreen.findViewById(R.id.fs_collapsed_icon_IV);
+
+        if (isFloatingTurnedOn){
+            goFloatingIcon();
+        } else {
+            goFullScreen();
+        }
+
+        unlockMode = 2;
+        knockCode.add(0);
+        knockCode.add(1);
+        knockCode.add(2);
+        knockCode.add(3);
+        /*
+        0- single click
+        1- double click
+        2- knock code
+        */
+        if (unlockMode == 0){
+            fullScreen.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    deactivateFullScreen();
+                }
+            });
+        }
+        else if (unlockMode == 1){
+            fullScreen.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clicked++;
+                    if (clicked == 2){
+                        deactivateFullScreen();
+                    }
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            clicked = 0;
+                        }
+                    }, doubleClickTime);
+
+                }
+            });
+        }
+        else if (unlockMode == 2){
+            box0.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    knockSeq.add(0);
+                    runKnockHandler();
+                }
+            });
+            box1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    knockSeq.add(1);
+                    runKnockHandler();
+                }
+            });
+            box2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    knockSeq.add(2);
+                    runKnockHandler();
+                }
+            });
+            box3.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    knockSeq.add(3);
+                    runKnockHandler();
+                }
+            });
+
+        }
+
+
+        mDate = (TextClock) mBlackScreen.findViewById(R.id.dateTV);
+        mClock = (TextClock) mBlackScreen.findViewById(R.id.clockTV);
+        mClock2 = (TextClock) mBlackScreen.findViewById(R.id.clockTV2);
+
+        setClock();
+
+        floatingIcon.setOnTouchListener(new View.OnTouchListener() {
+            int initialX;
+            int initialY;
+            float initialTouchX;
+            float initialTouchY;
+
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+
+                        //remember the initial position.
+                        initialX = params.x;
+                        initialY = params.y;
+
+                        //get the touch location
+                        initialTouchX = event.getRawX();
+                        initialTouchY = event.getRawY();
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        int Xdiff = (int) (event.getRawX() - initialTouchX);
+                        int Ydiff = (int) (event.getRawY() - initialTouchY);
+
+
+                        //The check for Xdiff <10 && YDiff< 10 because sometime elements moves a little while clicking.
+                        //So that is click event.
+                        if (Xdiff < 5 && Ydiff < 5 && Xdiff > -5 && Ydiff > -5) {
+
+                            //When user clicks on the image view of the collapsed layout,
+                            //visibility of the collapsed layout will be changed to "View.GONE"
+                            //and expanded view will become visible.
+                            goFullScreen();
+
+                        }
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        //Calculate the X and Y coordinates of the view.
+                        params.x = initialX + (int) (event.getRawX() - initialTouchX);
+                        params.y = initialY + (int) (event.getRawY() - initialTouchY);
+
+
+                        //Update the layout with new X & Y coordinate
+                        mWindowManager.updateViewLayout(mBlackScreen, params);
+                        return true;
+
+                }
+                return false;
+            }
+        });
+
+
+
+
+
+
+
+
+    }
+
+
+    private void setClock(){
+        if(!isClock){
+            mDate.setVisibility(View.INVISIBLE);
+            mClock.setVisibility(View.INVISIBLE);
+            mClock2.setVisibility(View.INVISIBLE);
+        }
+        else{
+            mDate.setVisibility(View.VISIBLE);
+            mClock.setVisibility(View.VISIBLE);
+            mClock2.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+
+    private WindowManager.LayoutParams show(){
+        WindowManager.LayoutParams params;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            params = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.TYPE_PHONE,
+                    getParamsFlags(),
+                    PixelFormat.TRANSLUCENT);
+        } else {
+            params = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                    getParamsFlags(),
+                    PixelFormat.TRANSLUCENT);
+        }
+        if (isBrightness){
+            if (!isFloating) {
+                params.screenBrightness = 0.0f;
+            } else {
+                params.screenBrightness = -1.0f;
+            }
+        }
+        params.gravity = Gravity.START | Gravity.TOP;
+        if (isFloating) {
+            params.x = prevX;
+            params.y = prevY;
+        } else {
+            params.x = 0;
+            params.y = 0;
+        }
+        return params;
+
+    }
+
+    private int getParamsFlags(){
+        int mFlags;
+        if (isFloating) {
+            mFlags = (WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                    | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                    | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
+                    | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                    | WindowManager.LayoutParams.SCREEN_ORIENTATION_CHANGED);
+        } else {
+            mFlags = (WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                    | WindowManager.LayoutParams.FLAG_FULLSCREEN
+                    | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                    | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
+                    | WindowManager.LayoutParams.SCREEN_ORIENTATION_CHANGED);
+        }
+        return mFlags;
+    }
+
+    private int getNavigationBarSize(){
+        Resources resources = getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return resources.getDimensionPixelSize(resourceId);
+        }
+        return 0;
+    }
+
+    private int getStatusBarSize(){
+        Resources resources = getResources();
+        int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return resources.getDimensionPixelSize(resourceId);
+        }
+        return 0;
+    }
+
+    private void goFullScreen(){
+        isFloating = false;
+        prevX = params.x;
+        prevY = params.y;
+        DisplayMetrics metrics = new DisplayMetrics();
+        Display display = mWindowManager.getDefaultDisplay();
+        display.getMetrics(metrics);
+        int navBar = getNavigationBarSize();
+        int statusBar = getStatusBarSize();
+        params.flags = getParamsFlags();
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            params.width = metrics.widthPixels + navBar;
+            params.height = metrics.heightPixels + statusBar;
+        } else {
+            params.width = metrics.widthPixels;
+            params.height = metrics.heightPixels + navBar + statusBar;
+        }
+        params.x = 0;
+        params.y = -statusBar;
+        floatingIcon.setVisibility(View.GONE);
+        fullScreen.setVisibility(View.VISIBLE);
+        mWindowManager.updateViewLayout(mBlackScreen, params);
+    }
+
+    private void goFloatingIcon(){
+        isFloating = true;
+        //params.width = floatingIconIV.getMeasuredWidth();
+        //params.height = floatingIconIV.getMeasuredHeight();
+        int size;
+        if (floatingSize == 0){
+            size = 200;
+        } else if (floatingSize == 1){
+            size = 400;
+        } else {
+            size = 600;
+        }
+        params.flags = getParamsFlags();
+        params.width = size;
+        params.height = size;
+        params.x = prevX;
+        params.y = prevY;
+        floatingIcon.setVisibility(View.VISIBLE);
+        fullScreen.setVisibility(View.GONE);
+        mWindowManager.updateViewLayout(mBlackScreen, params);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (isFloating) {
+            Display display = mWindowManager.getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            int screenWidth = size.x;
+            int screenHeight = size.y;
+            int tx, ty;
+            int nxp, nyp;
+            float nxpf, nypf;
+            float xper, yper;
+
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                tx = params.y;
+                ty = params.x;
+                xper = (float) tx / screenWidth;
+                yper = (float) ty / screenHeight;
+                nxpf = xper * screenHeight;
+                nypf = yper * screenWidth;
+                nxp = (int) nxpf;
+                nyp = (int) nypf;
+                params.x = nyp;
+                params.y = nxp;
+            } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                tx = params.x;
+                ty = params.y;
+                xper = (float) tx / screenHeight;
+                yper = (float) ty / screenWidth;
+                nxpf = xper * screenWidth;
+                nypf = yper * screenHeight;
+                nxp = (int) nxpf;
+                nyp = (int) nypf;
+                params.x = nxp;
+                params.y = nyp;
+            }
+            mWindowManager.updateViewLayout(mBlackScreen, params);
+        } else {
+            goFullScreen();
+        }
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopSelf();
+        //if (mBlackScreen != null) mWindowManager.removeView(mBlackScreen);
+        try {
+            mWindowManager.removeView(mBlackScreen);
+        } catch (Exception e) {
+
+        }
+    }
+
+    private void deactivateFullScreen(){
+        if (isFloatingTurnedOn){
+            goFloatingIcon();
+        } else {
+            hideFullScreen();
+        }
+    }
+
+    private void hideFullScreen() {
+        /*fullScreen.setVisibility(View.GONE);
+        mWindowManager.updateViewLayout(mBlackScreen, params);*/
+        mWindowManager.removeView(mBlackScreen);
+    }
+
+    private void killService(){
+        stopSelf();
+    }
+
+    private void runKnockHandler(){
+        wasBoxClicked = true;
+        boolean correct = knockSeq.equals(knockCode);
+        if (correct){
+            deactivateFullScreen();
+        }
+        else{
+            timerHandler.removeCallbacks(timerRunnable);
+            startTime = System.currentTimeMillis();
+            timerHandler.post(timerRunnable);
+        }
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    getResources().getString(R.string.service_channel),
+                    "Foreground Service Channel",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(serviceChannel);
+        }
+    }
+
+
+}

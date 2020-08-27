@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Black It</string>
+    <string name="toggle_button_1">FLOATING ICON</string>
+    <string name="toggle_button_2">STATUS BAR ONLY</string>
+    <string name="settings">SETTINGS</string>
+    <string name="settings_enable_clock">Enable clock</string>
+    <string name="settings_enable_buttons">Hide status and navigation bar</string>
+    <string name="buttons_info">Note: newer Android phones does not support hiding status and navigation bar.</string>
+    <string name="settings_brightness_buttons">Dim the screen</string>
+    <string name="service_context">Tap to activate</string>
+    <string name="service_channel">BlackItForegroundServiceChannel</string>
+
+
+
+
+
+
+
+
+
+    <string name="preferences_file_key">black_it_preferences</string>
+</resources>
