@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground">
+
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/settings_clock_switch"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentEnd="true"
+        android:text="@string/settings_enable_clock"
+        android:textSize="20sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:textColor="@color/colorBackground2" />
+
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/settings_buttons_switch"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/settings_clock_switch"
+        android:text="@string/settings_enable_buttons"
+        android:textColor="@color/colorBackground2"
+        android:textSize="20sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp" />
+
+    <TextView
+        android:id="@+id/sett_textView4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/settings_buttons_switch"
+        android:textColor="@color/colorBackground2"
+        android:textSize="14sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="@string/buttons_info" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/settings_brightness_switch"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/sett_textView4"
+        android:text="@string/settings_brightness_buttons"
+        android:textColor="@color/colorBackground2"
+        android:textSize="20sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp" />
+
+
+</RelativeLayout>
