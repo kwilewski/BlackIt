@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         int unlockMode = mSettingsViewModel.getUnlockMode().getValue();
         int screenMode = mSettingsViewModel.getScreenMode().getValue();
         boolean isClock = mSettingsViewModel.getIsClockEnabledBool();
-        boolean isBrightness = mSettingsViewModel.getIsBrightnessOff().getValue();
+        boolean isBrightness = mSettingsViewModel.getIsBrightnessOffBool();
         boolean isButtons = mSettingsViewModel.getIsButtonsEnabledBool();
         boolean isFloatingBoolean = mSettingsViewModel.getIsFloatingBoolean();
         Intent intent = new Intent(MainActivity.this, FloatingViewService.class);

@@ -26,6 +26,7 @@
             android:name=".views.UI.FloatingViewService"
             android:enabled="true"
             android:exported="false"/>
+        <receiver android:name=".views.broadcast.GoFSReceiver" />
     </application>
 
 </manifest>

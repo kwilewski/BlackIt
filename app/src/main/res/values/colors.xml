@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#550000</color>
+    <color name="colorPrimaryDark">#800000</color>
+    <color name="colorPrimary2">#444444</color>
+    <color name="colorPrimaryDark2">#444444</color>
+    <color name="colorAccent">#00ff00</color>
+    <color name="colorAccentDark">#666666</color>
+
+    <color name="colorBackground">#000000</color>
+    <color name="colorBackgroundDark">#000000</color>
+
+    <color name="colorBackground2">#cccccc</color>
+    <color name="colorBackgroundDark2">#222222</color>
+
+    <color name="colorBackgroundFV">#aaffffff</color>
+    <color name="colorBackgroundFVDark">#aa000000</color>
+
+    <color name="colorChecked">#00ff00</color>
+    <color name="colorCheckedDark">#005500</color>
+
+    <color name="colorMainFont">#cccccc</color>
+    <color name="colorMainFontDark">#888888</color>
+
+    <color name="colorMainFont2">#181818</color>
+    <color name="colorMainFontDark2">#666666</color>
+
+    <color name="colorMainFont3">#181818</color>
+    <color name="colorMainFontDark3">#888888</color>
+
+    <color name="colorMainFont4">#000000</color>
+    <color name="colorMainFontDark4">#ffffff</color>
+
+    <color name="colorButtonText">#666666</color>
+    <color name="colorButtonCheckedText">#cccccc</color>
+</resources>

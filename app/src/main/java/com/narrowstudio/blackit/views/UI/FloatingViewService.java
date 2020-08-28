@@ -6,7 +6,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -36,12 +39,11 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.narrowstudio.blackit.R;
 import com.narrowstudio.blackit.viewmodels.SettingsViewModel;
+import com.narrowstudio.blackit.views.broadcast.GoFSReceiver;
 
 import java.util.ArrayList;
 
 public class FloatingViewService extends Service {
-
-    public static final String CHANNEL_ID = "ForegroundServiceChannel";
 
     private View mBlackScreen, fullScreen, floatingIcon;
     private WindowManager mWindowManager;
@@ -58,6 +60,7 @@ public class FloatingViewService extends Service {
     private boolean isClock, isBrightness, isButtons, isFloating, isFloatingTurnedOn;
     private ImageView floatingIconIV;
     private int prevX = 20, prevY = 70;
+    private boolean viewExists = false;
 
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
@@ -94,19 +97,29 @@ public class FloatingViewService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         createNotificationChannel();
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        Intent notificationHomeIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingHomeIntent = PendingIntent.getActivity(this,
+                0, notificationHomeIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Intent broadcastIntent = new Intent(this, GoFSReceiver.class).setAction("fullscreen");
+        PendingIntent actionIntent = PendingIntent.getBroadcast(this,
+                0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent broadcastKillIntent = new Intent(this, GoFSReceiver.class).setAction("kill");
+        PendingIntent actionKillIntent = PendingIntent.getBroadcast(this,
+                0, broadcastKillIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
 
         Notification notification = new NotificationCompat.Builder(this, getResources().getString(R.string.service_channel))
                 .setContentText(getString(R.string.service_context))
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setNotificationSilent()
-                .setContentIntent(pendingIntent)
+                .setContentIntent(actionIntent)
+                .addAction(R.mipmap.ic_launcher, "Options", pendingHomeIntent)
+                .addAction(R.mipmap.ic_launcher, "Close", actionKillIntent)
                 .build();
         startForeground(1, notification);
-
-
 
 
         Bundle mBundle = intent.getExtras();
@@ -129,7 +142,8 @@ public class FloatingViewService extends Service {
         //mSettingsViewModel = ViewModelProviders.of((FragmentActivity) FloatingViewService.this.getApplicationContext()).get(SettingsViewModel.class);
         //mSettingsViewModel = new ViewModelProvider(FloatingViewService.this.getApplicationContext()).get(SettingsViewModel.class);
         mBlackScreen = LayoutInflater.from(this).inflate(R.layout.layout_floating_screen, null);
-
+        IntentFilter filter = new IntentFilter("com.narrowstudio.blackit.FS_ACTION");
+        registerReceiver(mBroadcastReceiver, filter);
 
 
     }
@@ -140,7 +154,7 @@ public class FloatingViewService extends Service {
 
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowManager.addView(mBlackScreen, params);
-        mWindowManager.updateViewLayout(mBlackScreen, params);
+        viewExists = true;
 
         fullScreen = mBlackScreen.findViewById(R.id.fs_full_screen);
         box0 = mBlackScreen.findViewById(R.id.fs_window_0);
@@ -287,11 +301,6 @@ public class FloatingViewService extends Service {
 
 
 
-
-
-
-
-
     }
 
 
@@ -329,9 +338,9 @@ public class FloatingViewService extends Service {
         }
         if (isBrightness){
             if (!isFloating) {
-                params.screenBrightness = 0.0f;
+                params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF;
             } else {
-                params.screenBrightness = -1.0f;
+                params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE;
             }
         }
         params.gravity = Gravity.START | Gravity.TOP;
@@ -343,6 +352,76 @@ public class FloatingViewService extends Service {
             params.y = 0;
         }
         return params;
+
+    }
+
+
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Display display = mWindowManager.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int screenWidth = size.x;
+        int screenHeight = size.y;
+        int tx, ty;
+        int nxp, nyp;
+        float nxpf, nypf;
+        float xper, yper;
+
+        if (isFloating) {
+
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                tx = params.y;
+                ty = params.x;
+                xper = (float) tx / screenWidth;
+                yper = (float) ty / screenHeight;
+                nxpf = xper * screenHeight;
+                nypf = yper * screenWidth;
+                nxp = (int) nxpf;
+                nyp = (int) nypf;
+                params.x = nyp;
+                params.y = nxp;
+            } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                tx = params.x;
+                ty = params.y;
+                xper = (float) tx / screenHeight;
+                yper = (float) ty / screenWidth;
+                nxpf = xper * screenWidth;
+                nypf = yper * screenHeight;
+                nxp = (int) nxpf;
+                nyp = (int) nypf;
+                params.x = nxp;
+                params.y = nyp;
+            }
+            mWindowManager.updateViewLayout(mBlackScreen, params);
+        } else {
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                tx = prevX;
+                ty = prevY;
+                xper = (float) tx / screenHeight;
+                yper = (float) ty / screenWidth;
+                nxpf = xper * screenWidth;
+                nypf = yper * screenHeight;
+                nxp = (int) nxpf;
+                nyp = (int) nypf;
+                prevY = nyp;
+                prevX = nxp;
+            } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                tx = prevX;
+                ty = prevY;
+                xper = (float) tx / screenHeight;
+                yper = (float) ty / screenWidth;
+                nxpf = xper * screenWidth;
+                nypf = yper * screenHeight;
+                nxp = (int) nxpf;
+                nyp = (int) nypf;
+                prevX = nxp;
+                prevY = nyp;
+            }
+            goFullScreen();
+        }
 
     }
 
@@ -384,11 +463,15 @@ public class FloatingViewService extends Service {
 
     private void goFullScreen(){
         isFloating = false;
-        prevX = params.x;
-        prevY = params.y;
         DisplayMetrics metrics = new DisplayMetrics();
         Display display = mWindowManager.getDefaultDisplay();
         display.getMetrics(metrics);
+
+        if (fullScreen.getVisibility() != View.VISIBLE) {
+            prevX = params.x;
+            prevY = params.y;
+        }
+
         int navBar = getNavigationBarSize();
         int statusBar = getStatusBarSize();
         params.flags = getParamsFlags();
@@ -401,26 +484,55 @@ public class FloatingViewService extends Service {
         }
         params.x = 0;
         params.y = -statusBar;
-        floatingIcon.setVisibility(View.GONE);
-        fullScreen.setVisibility(View.VISIBLE);
-        mWindowManager.updateViewLayout(mBlackScreen, params);
+        if (isBrightness){
+            if (!isFloating) {
+                params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF;
+            } else {
+                params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE;
+            }
+        }
+        if (viewExists) {
+            floatingIcon.setVisibility(View.GONE);
+            fullScreen.setVisibility(View.VISIBLE);
+            mWindowManager.updateViewLayout(mBlackScreen, params);
+        } else {
+            mWindowManager.addView(mBlackScreen, params);
+            viewExists = true;
+        }
     }
 
     private void goFloatingIcon(){
         isFloating = true;
+
+        int iconSize;
+        if (floatingSize == 0){
+            iconSize = 200;
+        } else if (floatingSize == 1){
+            iconSize = 400;
+        } else {
+            iconSize = 600;
+        }
         //params.width = floatingIconIV.getMeasuredWidth();
         //params.height = floatingIconIV.getMeasuredHeight();
-        int size;
-        if (floatingSize == 0){
-            size = 200;
-        } else if (floatingSize == 1){
-            size = 400;
-        } else {
-            size = 600;
+        Display display = mWindowManager.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+
+        //check if starting point is on the screen
+        if (prevY < 20){
+            prevY = 20;
+        } else if (prevY > size.y) {
+            prevY = size.y - 20 - iconSize;
         }
+        if (prevX < 20){
+            prevX = 20;
+        } else if (prevX > size.x) {
+            prevX = size.x - 20 - iconSize;
+        }
+
         params.flags = getParamsFlags();
-        params.width = size;
-        params.height = size;
+        params.width = iconSize;
+        params.height = iconSize;
         params.x = prevX;
         params.y = prevY;
         floatingIcon.setVisibility(View.VISIBLE);
@@ -428,64 +540,23 @@ public class FloatingViewService extends Service {
         mWindowManager.updateViewLayout(mBlackScreen, params);
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        if (isFloating) {
-            Display display = mWindowManager.getDefaultDisplay();
-            Point size = new Point();
-            display.getSize(size);
-            int screenWidth = size.x;
-            int screenHeight = size.y;
-            int tx, ty;
-            int nxp, nyp;
-            float nxpf, nypf;
-            float xper, yper;
-
-            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                tx = params.y;
-                ty = params.x;
-                xper = (float) tx / screenWidth;
-                yper = (float) ty / screenHeight;
-                nxpf = xper * screenHeight;
-                nypf = yper * screenWidth;
-                nxp = (int) nxpf;
-                nyp = (int) nypf;
-                params.x = nyp;
-                params.y = nxp;
-            } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                tx = params.x;
-                ty = params.y;
-                xper = (float) tx / screenHeight;
-                yper = (float) ty / screenWidth;
-                nxpf = xper * screenWidth;
-                nypf = yper * screenHeight;
-                nxp = (int) nxpf;
-                nyp = (int) nypf;
-                params.x = nxp;
-                params.y = nyp;
-            }
-            mWindowManager.updateViewLayout(mBlackScreen, params);
-        } else {
-            goFullScreen();
-        }
-
-    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(mBroadcastReceiver);
         stopSelf();
         //if (mBlackScreen != null) mWindowManager.removeView(mBlackScreen);
         try {
             mWindowManager.removeView(mBlackScreen);
+            viewExists = false;
         } catch (Exception e) {
 
         }
     }
 
     private void deactivateFullScreen(){
+        params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE;
         if (isFloatingTurnedOn){
             goFloatingIcon();
         } else {
@@ -497,6 +568,7 @@ public class FloatingViewService extends Service {
         /*fullScreen.setVisibility(View.GONE);
         mWindowManager.updateViewLayout(mBlackScreen, params);*/
         mWindowManager.removeView(mBlackScreen);
+        viewExists = false;
     }
 
     private void killService(){
@@ -521,12 +593,28 @@ public class FloatingViewService extends Service {
             NotificationChannel serviceChannel = new NotificationChannel(
                     getResources().getString(R.string.service_channel),
                     "Foreground Service Channel",
-                    NotificationManager.IMPORTANCE_DEFAULT
+                    NotificationManager.IMPORTANCE_MIN
             );
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(serviceChannel);
         }
     }
+
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getExtras().getString("actionname");
+            switch (action) {
+                case "fullscreen":
+                    goFullScreen();
+                    break;
+                case "kill":
+                    killService();
+                    break;
+            }
+        }
+    };
 
 
 }

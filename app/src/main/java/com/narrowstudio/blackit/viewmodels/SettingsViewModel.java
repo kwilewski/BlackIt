@@ -147,8 +147,8 @@ public class SettingsViewModel extends AndroidViewModel {
 
     public void setIsBrightnessOff(boolean sett){
         isBrightnessBool = !isBrightnessBool;
-        mSettings.setIsBrightnessOff(isBrightnessBool);
-        isBrightness.postValue(isBrightnessBool);
+        mSettings.setIsBrightnessOff(sett);
+        isBrightness.postValue(sett);
     }
 
     public LiveData<Boolean> getIsButtonsEnabled(){
