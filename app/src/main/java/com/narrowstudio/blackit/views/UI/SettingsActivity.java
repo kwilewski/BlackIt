@@ -2,12 +2,17 @@ package com.narrowstudio.blackit.views.UI;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
@@ -15,11 +20,15 @@ import androidx.lifecycle.ViewModelProviders;
 import com.narrowstudio.blackit.R;
 import com.narrowstudio.blackit.viewmodels.SettingsViewModel;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private SettingsViewModel mSettingsViewModel;
     private SwitchCompat clockSwitch, buttonsSwitch, brightnessSwitch;
     private boolean isClock, isButtons, isBrightness;
+    private Button knockButton;
+    private Spinner unlockModeSpinner;
+    private ArrayAdapter unlockSpinnerAdapter;
+    int unMode = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -29,6 +38,8 @@ public class SettingsActivity extends AppCompatActivity {
         clockSwitch = (SwitchCompat) findViewById(R.id.settings_clock_switch);
         buttonsSwitch = (SwitchCompat) findViewById(R.id.settings_buttons_switch);
         brightnessSwitch = (SwitchCompat) findViewById(R.id.settings_brightness_switch);
+        knockButton = (Button) findViewById(R.id.knock_options_button);
+        unlockModeSpinner = (Spinner) findViewById(R.id.unlock_mode_selection_spinner);
 
         mSettingsViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
         mSettingsViewModel.init();
@@ -84,6 +95,21 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        unlockSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.select_unlock_array, R.layout.my_spinner_item);
+        unlockSpinnerAdapter.setDropDownViewResource(R.layout.my_spinner_dropdown_item);
+        unlockModeSpinner.setAdapter(unlockSpinnerAdapter);
+        unlockModeSpinner.setOnItemSelectedListener(this);
+        LiveData<Integer> unModeLD = mSettingsViewModel.getUnlockMode();
+        unModeLD.observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                setKnockButton();
+            }
+        });
+        unMode = mSettingsViewModel.getUnlockModeInt();
+        unlockModeSpinner.setSelection(unMode);
+        setKnockButton();
+
 
 
     }
@@ -104,5 +130,24 @@ public class SettingsActivity extends AppCompatActivity {
         isButtons = !mSettingsViewModel.getIsButtonsEnabledBool();
         buttonsSwitch.setChecked(isButtons);
         mSettingsViewModel.setIsButtonsEnabled(isButtons);
+    }
+
+    private void setKnockButton(){
+        unMode = mSettingsViewModel.getUnlockModeInt();
+        if (unMode != 2){
+            knockButton.setEnabled(false);
+        } else {
+            knockButton.setEnabled(true);
+        }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        mSettingsViewModel.setUnlockMode(i);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 }
