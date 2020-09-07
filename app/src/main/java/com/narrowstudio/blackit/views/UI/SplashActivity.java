@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.narrowstudio.blackit.R;
@@ -21,7 +22,7 @@ public class SplashActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_splash);
 
-        mSplashViewModel = ViewModelProviders.of(this).get(SplashViewModel.class);
+        mSplashViewModel = new ViewModelProvider(this).get(SplashViewModel.class);
         mSplashViewModel.init();
         mSplashViewModel.getIsSplash().observe(this, new Observer<Boolean>() {
             @Override

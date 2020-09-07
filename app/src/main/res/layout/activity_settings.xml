@@ -1,58 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground">
 
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/settings_clock_switch"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_alignParentEnd="true"
-        android:text="@string/settings_enable_clock"
-        android:textSize="20sp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:textColor="@color/colorBackground2" />
-
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/settings_buttons_switch"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/settings_clock_switch"
-        android:text="@string/settings_enable_buttons"
-        android:textColor="@color/colorBackground2"
-        android:textSize="20sp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp" />
-
-    <TextView
-        android:id="@+id/sett_textView4"
+    <RelativeLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/settings_buttons_switch"
-        android:textColor="@color/colorBackground2"
-        android:textSize="14sp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:text="@string/buttons_info" />
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/settings_brightness_switch"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/sett_textView4"
-        android:text="@string/settings_brightness_buttons"
-        android:textColor="@color/colorBackground2"
-        android:textSize="20sp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp" />
+        android:background="@color/colorBackground">
 
 
-</RelativeLayout>
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/settings_clock_switch"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_alignParentEnd="true"
+            android:text="@string/settings_enable_clock"
+            android:textSize="20sp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:textColor="@color/colorBackground2" />
+
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/settings_buttons_switch"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/settings_clock_switch"
+            android:text="@string/settings_enable_buttons"
+            android:textColor="@color/colorBackground2"
+            android:textSize="20sp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp" />
+
+        <TextView
+            android:id="@+id/sett_textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/settings_buttons_switch"
+            android:textColor="@color/colorBackground2"
+            android:textSize="14sp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/buttons_info" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/settings_brightness_switch"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/sett_textView4"
+            android:text="@string/settings_brightness_buttons"
+            android:textColor="@color/colorBackground2"
+            android:textSize="20sp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="23dp"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/unlock_mode_selection_container"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:layout_below="@id/settings_brightness_switch"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp">
+
+            <TextView
+                android:id="@+id/unlock_mode_selection_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_unlock"
+                android:textSize="20sp"
+                android:textColor="@color/colorBackground2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <Spinner
+                android:id="@+id/unlock_mode_selection_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/unlock_mode_selection_tv"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:popupBackground="@color/colorBackground"
+                android:gravity="end"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/knock_options_button"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_below="@+id/unlock_mode_selection_container"
+            android:backgroundTint="@color/colorBackgroundDark2"
+            android:text="@string/knock_pattern_button"
+            android:textColor="@color/colorBackground2"
+            android:padding="20dp"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+
+    </RelativeLayout>
+
+</ScrollView>

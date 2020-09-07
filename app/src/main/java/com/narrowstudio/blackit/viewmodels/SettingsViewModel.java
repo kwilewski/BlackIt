@@ -24,6 +24,7 @@ public class SettingsViewModel extends AndroidViewModel {
     private SettingsModel mSettings;
 
     private boolean isFloatingSetBool = false, isClockBool = true, isBrightnessBool = false, isButtonsBool = true;
+    private int unlockModeInt = 0;
 
     private MutableLiveData<SharedPreferences> mPrefLD = new MutableLiveData<>();
     private MutableLiveData<Boolean> isFloatingSet = new MutableLiveData<>();
@@ -71,6 +72,7 @@ public class SettingsViewModel extends AndroidViewModel {
         mPreferences = mSettings.getPreferences().getValue();
         mPrefLD.postValue(mPreferences);
         isFloatingSetBool = mPreferences.getBoolean("floating_mode", false);
+        unlockModeInt = mPreferences.getInt("unlock_mode", 0);
         isFloatingSet.postValue(isFloatingSetBool);
         unlockMode.postValue(mPreferences.getInt("unlock_mode", 0));
         screenMode.postValue(mPreferences.getInt("screen_mode", 0));
@@ -103,6 +105,17 @@ public class SettingsViewModel extends AndroidViewModel {
 
     public LiveData<Integer> getUnlockMode(){
         return unlockMode;
+    }
+
+    public int getUnlockModeInt() {
+        int ret = mPreferences.getInt("unlock_mode", 0);
+        return ret;
+    }
+
+    public void setUnlockMode(int mode) {
+        mSettings.setUnlockMode(mode);
+        unlockMode.postValue(mode);
+        unlockModeInt = mode;
     }
 
     public LiveData<Integer> getScreenMode(){

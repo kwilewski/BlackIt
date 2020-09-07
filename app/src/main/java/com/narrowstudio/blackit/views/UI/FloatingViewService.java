@@ -61,6 +61,7 @@ public class FloatingViewService extends Service {
     private ImageView floatingIconIV;
     private int prevX = 20, prevY = 70;
     private boolean viewExists = false;
+    private String knockCodeString = "";
 
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
@@ -118,17 +119,20 @@ public class FloatingViewService extends Service {
                 .setContentIntent(actionIntent)
                 .addAction(R.mipmap.ic_launcher, "Options", pendingHomeIntent)
                 .addAction(R.mipmap.ic_launcher, "Close", actionKillIntent)
+                .setShowWhen(false)
                 .build();
         startForeground(1, notification);
 
 
         Bundle mBundle = intent.getExtras();
-        unlockMode = mBundle.getInt("unlock");
+        unlockMode = mBundle.getInt("unlock", 0);
         screenMode = mBundle.getInt("screen");
         isClock = mBundle.getBoolean("clock", true);
         isBrightness = mBundle.getBoolean("brightness", false);
         isButtons = mBundle.getBoolean("buttons", true);
         isFloatingTurnedOn = mBundle.getBoolean("floating", false);
+        knockCodeString = mBundle.getString("knock_code", "0123");
+        knockCode = setKnockCodeAL();
         windowSetup();
         if (!isFloatingTurnedOn){
             deactivateFullScreen();
@@ -139,8 +143,6 @@ public class FloatingViewService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        //mSettingsViewModel = ViewModelProviders.of((FragmentActivity) FloatingViewService.this.getApplicationContext()).get(SettingsViewModel.class);
-        //mSettingsViewModel = new ViewModelProvider(FloatingViewService.this.getApplicationContext()).get(SettingsViewModel.class);
         mBlackScreen = LayoutInflater.from(this).inflate(R.layout.layout_floating_screen, null);
         IntentFilter filter = new IntentFilter("com.narrowstudio.blackit.FS_ACTION");
         registerReceiver(mBroadcastReceiver, filter);
@@ -172,11 +174,8 @@ public class FloatingViewService extends Service {
             goFullScreen();
         }
 
-        unlockMode = 2;
-        knockCode.add(0);
-        knockCode.add(1);
-        knockCode.add(2);
-        knockCode.add(3);
+
+
         /*
         0- single click
         1- double click
@@ -245,7 +244,6 @@ public class FloatingViewService extends Service {
         mDate = (TextClock) mBlackScreen.findViewById(R.id.dateTV);
         mClock = (TextClock) mBlackScreen.findViewById(R.id.clockTV);
         mClock2 = (TextClock) mBlackScreen.findViewById(R.id.clockTV2);
-
         setClock();
 
         floatingIcon.setOnTouchListener(new View.OnTouchListener() {
@@ -305,6 +303,30 @@ public class FloatingViewService extends Service {
 
 
     private void setClock(){
+        mDate = (TextClock) mBlackScreen.findViewById(R.id.dateTV);
+        mClock = (TextClock) mBlackScreen.findViewById(R.id.clockTV);
+        mClock2 = (TextClock) mBlackScreen.findViewById(R.id.clockTV2);
+
+        //setting format every time so the clock will set when reopened
+        if (mDate.is24HourModeEnabled()){
+            mDate.setFormat24Hour("dd.MM");
+        } else {
+            mDate.setFormat12Hour("MM/dd");
+        }
+
+        if (mClock.is24HourModeEnabled()){
+            mClock.setFormat24Hour("HH");
+        } else {
+            mClock.setFormat12Hour("hh");
+        }
+
+        if (mClock2.is24HourModeEnabled()){
+            mClock2.setFormat24Hour("mm");
+        } else {
+            mClock2.setFormat12Hour("mm");
+        }
+
+
         if(!isClock){
             mDate.setVisibility(View.INVISIBLE);
             mClock.setVisibility(View.INVISIBLE);
@@ -420,8 +442,12 @@ public class FloatingViewService extends Service {
                 prevX = nxp;
                 prevY = nyp;
             }
-            goFullScreen();
+            //anti activation while rotating
+            if (viewExists) {
+                goFullScreen();
+            }
         }
+
 
     }
 
@@ -499,6 +525,9 @@ public class FloatingViewService extends Service {
             mWindowManager.addView(mBlackScreen, params);
             viewExists = true;
         }
+
+        setClock();
+
     }
 
     private void goFloatingIcon(){
@@ -564,6 +593,17 @@ public class FloatingViewService extends Service {
         }
     }
 
+    private ArrayList<Integer> setKnockCodeAL(){
+        ArrayList<Integer> retAL = new ArrayList<>();
+        for (char c: knockCodeString.toCharArray()){
+            retAL.add(Integer.parseInt(String.valueOf(c)));
+        }
+        if (retAL.get(0) == null){
+            retAL.add(0);
+        }
+        return retAL;
+    }
+
     private void hideFullScreen() {
         /*fullScreen.setVisibility(View.GONE);
         mWindowManager.updateViewLayout(mBlackScreen, params);*/
@@ -572,7 +612,7 @@ public class FloatingViewService extends Service {
     }
 
     private void killService(){
-        stopSelf();
+        this.stopSelf();
     }
 
     private void runKnockHandler(){

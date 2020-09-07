@@ -10,6 +10,18 @@
     <string name="settings_brightness_buttons">Dim the screen</string>
     <string name="service_context">Tap to activate</string>
     <string name="service_channel">BlackItForegroundServiceChannel</string>
+    <string name="select_unlock">Select unlock method</string>
+    <string-array name="select_unlock_array">
+        <item>Single click</item>
+        <item>Double click</item>
+        <item>Knock pattern</item>
+    </string-array>
+    <string name="knock_pattern_button">Set knock pattern</string>
+    <string name="set_pattern">Set knock pattern</string>
+    <string name="knock_warning">Note: This method of locking your screen is not secure and can be bypassed.</string>
+    <string name="start_again">Start again</string>
+    <string name="confirm">Confirm</string>
+    <string name="knock_min_max">New Knock Pattern must be between 3 and 8 knocks</string>
 
 
 

@@ -7,6 +7,9 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.narrowstudio.blackit.R;
 
+import java.util.ArrayList;
+import java.util.Set;
+
 public class SettingsModel {
 
     private SharedPreferences mPreferences;
@@ -28,6 +31,12 @@ public class SettingsModel {
 
     private void setPreferences(){
         mPreferences = context.getSharedPreferences(context.getString(R.string.preferences_file_key), context.MODE_PRIVATE);
+    }
+
+    public void setUnlockMode(int mode) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putInt("unlock_mode", mode);
+        editor.apply();
     }
 
     public void setIsFloating(boolean sett){
@@ -54,11 +63,11 @@ public class SettingsModel {
         editor.apply();
     }
 
-
-
-
-
-
+    public void setKnockCode(String codeString){
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putString("knock_code", codeString);
+        editor.apply();
+    }
 
 
 }
