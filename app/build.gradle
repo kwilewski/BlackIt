@@ -35,5 +35,7 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$archLifecycleVersion"
     annotationProcessor "android.arch.lifecycle:compiler:$archLifecycleVersion"
 
+    //adMob
+    implementation 'com.google.android.gms:play-services-ads:19.3.0'
 
 }

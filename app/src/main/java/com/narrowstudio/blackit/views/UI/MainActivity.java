@@ -20,6 +20,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.narrowstudio.blackit.R;
 import com.narrowstudio.blackit.viewmodels.KnockViewModel;
 import com.narrowstudio.blackit.viewmodels.MainViewModel;
@@ -37,11 +42,22 @@ public class MainActivity extends AppCompatActivity {
     private SettingsViewModel mSettingsViewModel;
     private KnockViewModel mKnockViewModel;
     private LiveData<Boolean> isFloating, isServiceRunning;
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
+        mAdView = findViewById(R.id.adViewMainActivity);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         modeFloatingButton = (Button) findViewById(R.id.floatingMainButton);
         modeStatusButton = (Button) findViewById(R.id.barMainButton);

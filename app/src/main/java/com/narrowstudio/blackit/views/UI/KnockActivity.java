@@ -136,6 +136,8 @@ public class KnockActivity extends AppCompatActivity {
 
     private void setNewKnockCode(){
         mKnockViewModel.setNewKnockCode(this);
+        Toast toast = Toast.makeText(this, getResources().getString(R.string.knock_code_set), Toast.LENGTH_SHORT);
+        toast.show();
     }
 
 
