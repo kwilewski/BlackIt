@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:text="@string/set_pattern"
+        android:textColor="@color/colorBackground2"
+        android:textSize="35sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/knock_warning"
+        android:textColor="@color/colorBackground2"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/knock_vgl_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.2"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/knock_vgl_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="193dp"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/knock_vgl_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="20dp"
+        app:layout_constraintGuide_percent="0.8"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/knock_hgl_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="20dp"
+        app:layout_constraintGuide_percent="0.3"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/knock_hgl_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="20dp"
+        app:layout_constraintGuide_percent="0.5"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/knock_hgl_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="20dp"
+        app:layout_constraintGuide_percent="0.7"/>
+
+
+    <Button
+        android:id="@+id/knock_settings_button_0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/colorBackgroundDark2"
+        app:layout_constraintBottom_toTopOf="@+id/knock_hgl_2"
+        app:layout_constraintEnd_toStartOf="@+id/knock_vgl_2"
+        app:layout_constraintTop_toTopOf="@+id/knock_hgl_1"
+        app:layout_constraintStart_toEndOf="@+id/knock_vgl_1"
+        android:textColor="@color/colorBackground2"/>
+
+    <Button
+        android:id="@+id/knock_settings_button_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/colorBackgroundDark2"
+        app:layout_constraintBottom_toTopOf="@+id/knock_hgl_2"
+        app:layout_constraintEnd_toStartOf="@+id/knock_vgl_3"
+        app:layout_constraintStart_toStartOf="@+id/knock_vgl_2"
+        app:layout_constraintTop_toTopOf="@+id/knock_hgl_1"
+        android:textColor="@color/colorBackground2" />
+
+    <Button
+        android:id="@+id/knock_settings_button_2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/colorBackgroundDark2"
+        app:layout_constraintBottom_toTopOf="@+id/knock_hgl_3"
+        app:layout_constraintEnd_toStartOf="@+id/knock_vgl_2"
+        app:layout_constraintStart_toStartOf="@+id/knock_vgl_1"
+        app:layout_constraintTop_toTopOf="@+id/knock_hgl_2"
+        android:textColor="@color/colorBackground2" />
+
+    <Button
+        android:id="@+id/knock_settings_button_3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/colorBackgroundDark2"
+        app:layout_constraintBottom_toTopOf="@+id/knock_hgl_3"
+        app:layout_constraintEnd_toStartOf="@+id/knock_vgl_3"
+        app:layout_constraintStart_toStartOf="@+id/knock_vgl_2"
+        app:layout_constraintTop_toTopOf="@+id/knock_hgl_2"
+        android:textColor="@color/colorBackground2" />
+
+    <Button
+        android:id="@+id/knock_start_again_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/knock_vgl_2"
+        app:layout_constraintStart_toStartOf="parent"
+        android:backgroundTint="@color/colorBackgroundDark2"
+        android:textColor="@color/colorBackground2"
+        android:text="@string/start_again"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="20dp"/>
+
+    <Button
+        android:id="@+id/knock_confirm_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/knock_vgl_2"
+        android:backgroundTint="@color/colorBackgroundDark2"
+        android:textColor="@color/colorBackground2"
+        android:text="@string/confirm"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="40dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
