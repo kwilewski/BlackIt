@@ -20,9 +20,17 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.narrowstudio.blackit.R;
+import com.narrowstudio.blackit.viewmodels.KnockViewModel;
 import com.narrowstudio.blackit.viewmodels.MainViewModel;
 import com.narrowstudio.blackit.viewmodels.SettingsViewModel;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,12 +40,24 @@ public class MainActivity extends AppCompatActivity {
     private ImageView startIV;
     private MainViewModel mMainViewModel;
     private SettingsViewModel mSettingsViewModel;
+    private KnockViewModel mKnockViewModel;
     private LiveData<Boolean> isFloating, isServiceRunning;
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
+        mAdView = findViewById(R.id.adViewMainActivity);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         modeFloatingButton = (Button) findViewById(R.id.floatingMainButton);
         modeStatusButton = (Button) findViewById(R.id.barMainButton);
@@ -49,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
 
         mSettingsViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
         mSettingsViewModel.init();
+
+        mKnockViewModel = new ViewModelProvider(this).get(KnockViewModel.class);
+        mKnockViewModel.init();
 
         mSettingsViewModel.getIsFloating().observe(this, new Observer<Boolean>() {
             @Override
@@ -161,12 +184,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeView(){
-        int unlockMode = mSettingsViewModel.getUnlockMode().getValue();
+        int unlockMode = mSettingsViewModel.getUnlockModeInt();
         int screenMode = mSettingsViewModel.getScreenMode().getValue();
         boolean isClock = mSettingsViewModel.getIsClockEnabledBool();
         boolean isBrightness = mSettingsViewModel.getIsBrightnessOffBool();
         boolean isButtons = mSettingsViewModel.getIsButtonsEnabledBool();
         boolean isFloatingBoolean = mSettingsViewModel.getIsFloatingBoolean();
+        String knockCode = mKnockViewModel.getKnockCodeString();
         Intent intent = new Intent(MainActivity.this, FloatingViewService.class);
         intent.putExtra("unlock", unlockMode);
         intent.putExtra("screen", screenMode);
@@ -174,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("brightness", isBrightness);
         intent.putExtra("buttons", isButtons);
         intent.putExtra("floating", isFloatingBoolean);
+        intent.putExtra("knock_code", knockCode);
         this.startService(intent);
         //finish();
         this.moveTaskToBack(true);

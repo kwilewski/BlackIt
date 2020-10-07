@@ -1,5 +1,7 @@
 package com.narrowstudio.blackit.views.UI;
 
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,8 +19,15 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.narrowstudio.blackit.R;
 import com.narrowstudio.blackit.viewmodels.SettingsViewModel;
+
+import java.util.ArrayList;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -34,6 +43,16 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
+        AdView mAdView = findViewById(R.id.adViewSettings);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         clockSwitch = (SwitchCompat) findViewById(R.id.settings_clock_switch);
         buttonsSwitch = (SwitchCompat) findViewById(R.id.settings_buttons_switch);
@@ -99,16 +118,17 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         unlockSpinnerAdapter.setDropDownViewResource(R.layout.my_spinner_dropdown_item);
         unlockModeSpinner.setAdapter(unlockSpinnerAdapter);
         unlockModeSpinner.setOnItemSelectedListener(this);
-        LiveData<Integer> unModeLD = mSettingsViewModel.getUnlockMode();
-        unModeLD.observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                setKnockButton();
-            }
-        });
+        unlockSpinnerAdapter.notifyDataSetChanged();
+
         unMode = mSettingsViewModel.getUnlockModeInt();
         unlockModeSpinner.setSelection(unMode);
-        setKnockButton();
+
+        knockButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startKnockActivity();
+            }
+        });
 
 
 
@@ -132,14 +152,12 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         mSettingsViewModel.setIsButtonsEnabled(isButtons);
     }
 
-    private void setKnockButton(){
-        unMode = mSettingsViewModel.getUnlockModeInt();
-        if (unMode != 2){
-            knockButton.setEnabled(false);
-        } else {
-            knockButton.setEnabled(true);
-        }
+    private void startKnockActivity(){
+        Intent intent = new Intent(this,  KnockActivity.class);
+        startActivity(intent);
     }
+
+
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {

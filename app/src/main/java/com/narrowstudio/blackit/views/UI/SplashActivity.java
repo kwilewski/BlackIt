@@ -6,8 +6,10 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.google.android.gms.ads.MobileAds;
 import com.narrowstudio.blackit.R;
 import com.narrowstudio.blackit.viewmodels.SplashViewModel;
 
@@ -19,9 +21,11 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        MobileAds.initialize(this, getResources().getString(R.string.admob_ID));
+
         setContentView(R.layout.activity_splash);
 
-        mSplashViewModel = ViewModelProviders.of(this).get(SplashViewModel.class);
+        mSplashViewModel = new ViewModelProvider(this).get(SplashViewModel.class);
         mSplashViewModel.init();
         mSplashViewModel.getIsSplash().observe(this, new Observer<Boolean>() {
             @Override
