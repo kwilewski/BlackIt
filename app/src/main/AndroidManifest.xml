@@ -33,12 +33,13 @@
             android:screenOrientation="portrait"></activity>
         <service
             android:name=".views.UI.FloatingViewService"
+            android:process=":floatingProcess"
             android:enabled="true"
             android:exported="false" />
         <receiver android:name=".views.broadcast.GoFSReceiver" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-2378885218580222~8977564130"/>
     </application>
 
 </manifest>
