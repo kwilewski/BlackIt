@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#800000</color>
     <color name="colorPrimary2">#444444</color>
     <color name="colorPrimaryDark2">#444444</color>
-    <color name="colorAccent">#00ff00</color>
+    <color name="colorAccent">#bb0000</color>
     <color name="colorAccentDark">#666666</color>
 
     <color name="colorBackground">#000000</color>
@@ -16,8 +16,8 @@
     <color name="colorBackgroundFV">#aaffffff</color>
     <color name="colorBackgroundFVDark">#aa000000</color>
 
-    <color name="colorChecked">#00ff00</color>
-    <color name="colorCheckedDark">#005500</color>
+    <color name="colorChecked">#bb0000</color>
+    <color name="colorCheckedDark">#bb0000</color>
 
     <color name="colorMainFont">#cccccc</color>
     <color name="colorMainFontDark">#888888</color>
@@ -33,4 +33,6 @@
 
     <color name="colorButtonText">#666666</color>
     <color name="colorButtonCheckedText">#cccccc</color>
+
+    <color name="colorIconBackground">#77ccff</color>
 </resources>

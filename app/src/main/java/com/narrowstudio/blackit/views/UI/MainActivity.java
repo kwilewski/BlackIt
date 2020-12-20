@@ -163,6 +163,8 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                             Uri.parse("package:" + getPackageName()));
                     startActivityForResult(intent, CODE_DRAW_OVER_OTHER_APP_PERMISSION);
+                    Toast toast = Toast.makeText(this, getResources().getString(R.string.allow_overlay), Toast.LENGTH_LONG);
+                    toast.show();
                 } else {
                     //start service
                     initializeView();
@@ -190,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
         boolean isBrightness = mSettingsViewModel.getIsBrightnessOffBool();
         boolean isButtons = mSettingsViewModel.getIsButtonsEnabledBool();
         boolean isFloatingBoolean = mSettingsViewModel.getIsFloatingBoolean();
+        int iconSize = mSettingsViewModel.getIconSizeInt();
         String knockCode = mKnockViewModel.getKnockCodeString();
         Intent intent = new Intent(MainActivity.this, FloatingViewService.class);
         intent.putExtra("unlock", unlockMode);
@@ -199,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("buttons", isButtons);
         intent.putExtra("floating", isFloatingBoolean);
         intent.putExtra("knock_code", knockCode);
+        intent.putExtra("icon_size", iconSize);
         this.startService(intent);
         //finish();
         this.moveTaskToBack(true);

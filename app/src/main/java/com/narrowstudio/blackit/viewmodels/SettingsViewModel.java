@@ -24,11 +24,17 @@ public class SettingsViewModel extends AndroidViewModel {
     private SettingsModel mSettings;
 
     private boolean isFloatingSetBool = false, isClockBool = true, isBrightnessBool = false, isButtonsBool = true;
-    private int unlockModeInt = 0;
+    private int unlockModeInt = 0, iconSizeInt = 0;
 
     private MutableLiveData<SharedPreferences> mPrefLD = new MutableLiveData<>();
     private MutableLiveData<Boolean> isFloatingSet = new MutableLiveData<>();
     private MutableLiveData<Integer> unlockMode = new MutableLiveData<>();
+    private MutableLiveData<Integer> iconSize = new MutableLiveData<>();
+    /*
+    0 - small
+    1 - medium
+    2 - big
+     */
     private MutableLiveData<Boolean> isClock = new MutableLiveData<>();
     private MutableLiveData<Boolean> isBrightness = new MutableLiveData<>();
     private MutableLiveData<Boolean> isButtons = new MutableLiveData<>();
@@ -73,8 +79,10 @@ public class SettingsViewModel extends AndroidViewModel {
         mPrefLD.postValue(mPreferences);
         isFloatingSetBool = mPreferences.getBoolean("floating_mode", false);
         unlockModeInt = mPreferences.getInt("unlock_mode", 0);
+        iconSizeInt = mPreferences.getInt("icon_size", 1);
         isFloatingSet.postValue(isFloatingSetBool);
         unlockMode.postValue(mPreferences.getInt("unlock_mode", 0));
+        iconSize.postValue(mPreferences.getInt("icon_size", 1));
         screenMode.postValue(mPreferences.getInt("screen_mode", 0));
         isClockBool = mPreferences.getBoolean("clock", true);
         isClock.postValue(isClockBool);
@@ -116,6 +124,17 @@ public class SettingsViewModel extends AndroidViewModel {
         mSettings.setUnlockMode(mode);
         unlockMode.postValue(mode);
         unlockModeInt = mode;
+    }
+
+    public int getIconSizeInt() {
+        int ret = mPreferences.getInt("icon_size", 1);
+        return ret;
+    }
+
+    public void setIconSize(int size) {
+        mSettings.setIconSize(size);
+        iconSize.postValue(size);
+        iconSizeInt = size;
     }
 
     public LiveData<Integer> getScreenMode(){

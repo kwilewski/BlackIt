@@ -48,7 +48,7 @@ public class FloatingViewService extends Service {
     private View mBlackScreen, fullScreen, floatingIcon;
     private WindowManager mWindowManager;
     final WindowManager.LayoutParams params = show();
-    private int unlockMode = 0, screenMode = 0, clicked = 0, floatingSize = 0;
+    private int unlockMode = 0, screenMode = 0, clicked = 0, floatingSize = 0, iconSize = 0;
     private int doubleClickTime = 500, knockClickTime = 500;
     private ArrayList<Integer> knockCode = new ArrayList<>();
     private ArrayList<Integer> knockSeq = new ArrayList<>();
@@ -132,6 +132,7 @@ public class FloatingViewService extends Service {
         isButtons = mBundle.getBoolean("buttons", true);
         isFloatingTurnedOn = mBundle.getBoolean("floating", false);
         knockCodeString = mBundle.getString("knock_code", "0123");
+        iconSize = mBundle.getInt("icon_size", 1);
         knockCode = setKnockCodeAL();
         windowSetup();
         if (!isFloatingTurnedOn){
@@ -533,13 +534,13 @@ public class FloatingViewService extends Service {
     private void goFloatingIcon(){
         isFloating = true;
 
-        int iconSize;
-        if (floatingSize == 0){
-            iconSize = 200;
-        } else if (floatingSize == 1){
-            iconSize = 400;
+        int iconSizeDP;
+        if (iconSize == 0){
+            iconSizeDP = 80;
+        } else if (iconSize == 1){
+            iconSizeDP = 110;
         } else {
-            iconSize = 600;
+            iconSizeDP = 160;
         }
         //params.width = floatingIconIV.getMeasuredWidth();
         //params.height = floatingIconIV.getMeasuredHeight();
@@ -551,17 +552,17 @@ public class FloatingViewService extends Service {
         if (prevY < 20){
             prevY = 20;
         } else if (prevY > size.y) {
-            prevY = size.y - 20 - iconSize;
+            prevY = size.y - 20 - iconSizeDP;
         }
         if (prevX < 20){
             prevX = 20;
         } else if (prevX > size.x) {
-            prevX = size.x - 20 - iconSize;
+            prevX = size.x - 20 - iconSizeDP;
         }
 
         params.flags = getParamsFlags();
-        params.width = iconSize;
-        params.height = iconSize;
+        params.width = iconSizeDP;
+        params.height = iconSizeDP;
         params.x = prevX;
         params.y = prevY;
         floatingIcon.setVisibility(View.VISIBLE);

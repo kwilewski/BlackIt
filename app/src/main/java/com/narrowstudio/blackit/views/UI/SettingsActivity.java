@@ -35,9 +35,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     private SwitchCompat clockSwitch, buttonsSwitch, brightnessSwitch;
     private boolean isClock, isButtons, isBrightness;
     private Button knockButton;
-    private Spinner unlockModeSpinner;
-    private ArrayAdapter unlockSpinnerAdapter;
-    int unMode = 0;
+    private Spinner unlockModeSpinner, iconSizeSpinner;
+    private ArrayAdapter unlockSpinnerAdapter, iconSizeAdapter;
+    int unMode = 0, iconSize = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,6 +59,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         brightnessSwitch = (SwitchCompat) findViewById(R.id.settings_brightness_switch);
         knockButton = (Button) findViewById(R.id.knock_options_button);
         unlockModeSpinner = (Spinner) findViewById(R.id.unlock_mode_selection_spinner);
+        iconSizeSpinner = (Spinner) findViewById(R.id.icon_size_spinner);
 
         mSettingsViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
         mSettingsViewModel.init();
@@ -114,14 +115,30 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             }
         });
 
+        //setting up unlock spinner
         unlockSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.select_unlock_array, R.layout.my_spinner_item);
         unlockSpinnerAdapter.setDropDownViewResource(R.layout.my_spinner_dropdown_item);
         unlockModeSpinner.setAdapter(unlockSpinnerAdapter);
         unlockModeSpinner.setOnItemSelectedListener(this);
         unlockSpinnerAdapter.notifyDataSetChanged();
-
         unMode = mSettingsViewModel.getUnlockModeInt();
         unlockModeSpinner.setSelection(unMode);
+
+        //setting up icon size spinner
+        iconSizeAdapter = ArrayAdapter.createFromResource(this, R.array.icon_size_array, R.layout.my_spinner_item);
+        iconSizeAdapter.setDropDownViewResource(R.layout.my_spinner_dropdown_item);
+        iconSizeSpinner.setAdapter(iconSizeAdapter);
+        iconSizeSpinner.setOnItemSelectedListener(this);
+        iconSizeAdapter.notifyDataSetChanged();
+        //iconSize:
+        // 0 - small
+        // 1 - medium
+        // 2 - big
+        iconSize = mSettingsViewModel.getIconSizeInt();
+        iconSizeSpinner.setSelection(iconSize);
+
+
+
 
         knockButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,7 +178,11 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        mSettingsViewModel.setUnlockMode(i);
+        if(adapterView == unlockModeSpinner) {
+            mSettingsViewModel.setUnlockMode(i);
+        } else if (adapterView == iconSizeSpinner) {
+            mSettingsViewModel.setIconSize(i);
+        }
     }
 
     @Override

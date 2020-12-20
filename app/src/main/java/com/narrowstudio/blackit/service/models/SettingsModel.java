@@ -69,5 +69,11 @@ public class SettingsModel {
         editor.apply();
     }
 
+    public void setIconSize(int size){
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putInt("icon_size", size);
+        editor.apply();
+    }
+
 
 }

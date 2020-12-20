@@ -10,11 +10,17 @@
     <string name="settings_brightness_buttons">Dim the screen</string>
     <string name="service_context">Tap to activate</string>
     <string name="service_channel">BlackItForegroundServiceChannel</string>
-    <string name="select_unlock">Select unlock method</string>
+    <string name="select_unlock">Unlock method</string>
     <string-array name="select_unlock_array">
         <item>Single click</item>
         <item>Double click</item>
         <item>Knock pattern</item>
+    </string-array>
+    <string name="icon_size">Floating icon size</string>
+    <string-array name="icon_size_array">
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Big</item>
     </string-array>
     <string name="knock_pattern_button">Set knock pattern</string>
     <string name="set_pattern">Set knock pattern</string>
@@ -23,6 +29,7 @@
     <string name="confirm">Confirm</string>
     <string name="knock_min_max">New Knock Pattern must be between 3 and 8 knocks</string>
     <string name="knock_code_set">New Knock Pattern set</string>
+    <string name="allow_overlay">Black It needs a permission to be displayed over other apps.</string>
 
 
 
@@ -30,18 +37,18 @@
 
 
 
+    <!-- ______________________ change manifest as well!!!!! _________________________ !-->
 
-
-    <!-- ____________________________________ test ___________________________ !-->
+    <!-- ____________________________________ test ___________________________
 
     <string name="admob_ID">ca-app-pub-3940256099942544~3347511713</string>
     <string name="admob_banner_main">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="admob_banner_settings">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="admob_banner_settings">ca-app-pub-3940256099942544/6300978111</string>!-->
 
-    <!-- ___________________________________ release _________________________
-    <string name="admob_ID">ca-app-pub-3940256099942544~3347511713</string>
+    <!-- ___________________________________ release _________________________ !-->
+    <string name="admob_ID">ca-app-pub-2378885218580222~8977564130</string>
     <string name="admob_banner_main">ca-app-pub-2378885218580222/3696676669</string>
-    <string name="admob_banner_settings">ca-app-pub-2378885218580222/6267640311</string> !-->
+    <string name="admob_banner_settings">ca-app-pub-2378885218580222/6267640311</string>
 
     <string name="preferences_file_key">black_it_preferences</string>
 </resources>
