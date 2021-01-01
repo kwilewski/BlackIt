@@ -80,7 +80,7 @@
                     android:id="@+id/unlock_mode_selection_container"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
-                    android:layout_below="@id/settings_brightness_switch"
+                    android:layout_below="@id/settings_portrait_switch"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:orientation="horizontal">
@@ -157,6 +157,32 @@
                 <ScrollView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/settings_rotation_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_below="@id/settings_brightness_switch"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="23dp"
+                    android:layout_marginRight="20dp"
+                    android:text="@string/settings_lock_rotation"
+                    android:textColor="@color/colorBackground2"
+                    android:textSize="20sp" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/settings_portrait_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_below="@id/settings_rotation_switch"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="23dp"
+                    android:layout_marginRight="20dp"
+                    android:text="@string/settings_portrait_mode"
+                    android:textColor="@color/colorBackground2"
+                    android:textSize="20sp" />
 
 
             </RelativeLayout>

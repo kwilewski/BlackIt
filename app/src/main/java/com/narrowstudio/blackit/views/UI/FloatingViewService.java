@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
@@ -57,7 +58,7 @@ public class FloatingViewService extends Service {
     private int millisSet=500;
     private View box0, box1, box2, box3;
     private TextClock mClock, mClock2, mDate;
-    private boolean isClock, isBrightness, isButtons, isFloating, isFloatingTurnedOn;
+    private boolean isClock, isBrightness, isButtons, isFloating, isFloatingTurnedOn, isRotation, isPortrait;
     private ImageView floatingIconIV;
     private int prevX = 20, prevY = 70;
     private boolean viewExists = false;
@@ -133,6 +134,8 @@ public class FloatingViewService extends Service {
         isFloatingTurnedOn = mBundle.getBoolean("floating", false);
         knockCodeString = mBundle.getString("knock_code", "0123");
         iconSize = mBundle.getInt("icon_size", 1);
+        isRotation = mBundle.getBoolean("rotation", false);
+        isPortrait = mBundle.getBoolean("portrait", false);
         knockCode = setKnockCodeAL();
         windowSetup();
         if (!isFloatingTurnedOn){
@@ -366,6 +369,17 @@ public class FloatingViewService extends Service {
                 params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE;
             }
         }
+
+        if(!isFloating) {
+            if (!isRotation) {
+                if (isPortrait) {
+                    params.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+                } else {
+                    params.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED;
+                }
+            }
+        }
+
         params.gravity = Gravity.START | Gravity.TOP;
         if (isFloating) {
             params.x = prevX;

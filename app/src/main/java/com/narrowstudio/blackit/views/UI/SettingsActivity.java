@@ -32,8 +32,8 @@ import java.util.ArrayList;
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private SettingsViewModel mSettingsViewModel;
-    private SwitchCompat clockSwitch, buttonsSwitch, brightnessSwitch;
-    private boolean isClock, isButtons, isBrightness;
+    private SwitchCompat clockSwitch, buttonsSwitch, brightnessSwitch, rotationSwitch, portraitSwitch;
+    private boolean isClock, isButtons, isBrightness, isRotation, isPortrait;
     private Button knockButton;
     private Spinner unlockModeSpinner, iconSizeSpinner;
     private ArrayAdapter unlockSpinnerAdapter, iconSizeAdapter;
@@ -60,6 +60,8 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         knockButton = (Button) findViewById(R.id.knock_options_button);
         unlockModeSpinner = (Spinner) findViewById(R.id.unlock_mode_selection_spinner);
         iconSizeSpinner = (Spinner) findViewById(R.id.icon_size_spinner);
+        rotationSwitch = (SwitchCompat) findViewById(R.id.settings_rotation_switch);
+        portraitSwitch = (SwitchCompat) findViewById(R.id.settings_portrait_switch);
 
         mSettingsViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
         mSettingsViewModel.init();
@@ -95,6 +97,42 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             @Override
             public void onClick(View view) {
                 brightnessStatusChange();
+            }
+        });
+
+
+        //-------------------------------------------------------------------------------------------------------------rotation
+        isRotation = mSettingsViewModel.getIsRotationBool();
+        mSettingsViewModel.getIsRotation().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                isRotation = mSettingsViewModel.getIsRotationBool();
+                rotationSwitch.setChecked(isRotation);
+            }
+        });
+
+        rotationSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rotationStatusChange();
+            }
+        });
+
+
+        //-------------------------------------------------------------------------------------------------------------portrait
+        portraitSwitch.setEnabled(isRotation);
+        mSettingsViewModel.getIsPortrait().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                isPortrait = mSettingsViewModel.getIsPortraitBool();
+                portraitSwitch.setChecked(isPortrait);
+            }
+        });
+
+        portraitSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                portraitStatusChange();
             }
         });
 
@@ -167,6 +205,19 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         isButtons = !mSettingsViewModel.getIsButtonsEnabledBool();
         buttonsSwitch.setChecked(isButtons);
         mSettingsViewModel.setIsButtonsEnabled(isButtons);
+    }
+
+    private void rotationStatusChange(){
+        isRotation = !mSettingsViewModel.getIsRotationBool();
+        rotationSwitch.setChecked(isRotation);
+        mSettingsViewModel.setIsRotation(isRotation);
+        portraitSwitch.setEnabled(isRotation);
+    }
+
+    private void portraitStatusChange(){
+        isPortrait = !mSettingsViewModel.getIsPortraitBool();
+        portraitSwitch.setChecked(isPortrait);
+        mSettingsViewModel.setIsPortrait(isPortrait);
     }
 
     private void startKnockActivity(){

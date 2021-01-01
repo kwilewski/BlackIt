@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.text.BoringLayout;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -23,7 +24,8 @@ public class SettingsViewModel extends AndroidViewModel {
     private Context context;
     private SettingsModel mSettings;
 
-    private boolean isFloatingSetBool = false, isClockBool = true, isBrightnessBool = false, isButtonsBool = true;
+    private boolean isFloatingSetBool = false, isClockBool = true, isBrightnessBool = false, isButtonsBool = true,
+            isRotationBool = false, isPortraitBool = false;
     private int unlockModeInt = 0, iconSizeInt = 0;
 
     private MutableLiveData<SharedPreferences> mPrefLD = new MutableLiveData<>();
@@ -35,6 +37,7 @@ public class SettingsViewModel extends AndroidViewModel {
     1 - medium
     2 - big
      */
+
     private MutableLiveData<Boolean> isClock = new MutableLiveData<>();
     private MutableLiveData<Boolean> isBrightness = new MutableLiveData<>();
     private MutableLiveData<Boolean> isButtons = new MutableLiveData<>();
@@ -50,6 +53,9 @@ public class SettingsViewModel extends AndroidViewModel {
     0- black screen
     1- clock
      */
+
+    private MutableLiveData<Boolean> isRotation = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isPortrait = new MutableLiveData<>();
 
     private long startTime = 0,millis;
     private int millisSet=500;
@@ -90,6 +96,11 @@ public class SettingsViewModel extends AndroidViewModel {
         isBrightness.postValue(isBrightnessBool);
         isButtonsBool = mPreferences.getBoolean("buttons", false);
         isButtons.postValue(isButtonsBool);
+        isRotationBool = mPreferences.getBoolean("rotation", false);
+        isRotation.postValue(isRotationBool);
+        isPortraitBool = mPreferences.getBoolean("portrait", false);
+        isPortrait.postValue(isPortraitBool);
+        isButtons.postValue(isPortraitBool);
         isServiceRunning.postValue(false);
         isMyServiceRunning();
 
@@ -200,6 +211,45 @@ public class SettingsViewModel extends AndroidViewModel {
     public void setServiceNotRunning(){
         isServiceRunning.postValue(false);
     }
+
+
+    //--------------------------------------------------------------------------------------- rotation
+    public boolean getIsRotationBool() {
+        boolean ret = mPreferences.getBoolean("rotation", false);
+        return ret;
+    }
+
+    public void setIsRotation(boolean sett) {
+        mSettings.setRotation(sett);
+        isRotation.postValue(sett);
+        isRotationBool = sett;
+    }
+
+    public LiveData<Boolean> getIsRotation(){
+        return isRotation;
+    }
+
+    //-------------------------------------------------------------------------------------- portrait
+    public boolean getIsPortraitBool() {
+        boolean ret = mPreferences.getBoolean("portrait", false);
+        return ret;
+    }
+
+    public void setIsPortrait(boolean sett) {
+        mSettings.setPortrait(sett);
+        isPortrait.postValue(sett);
+        isPortraitBool = sett;
+    }
+
+    public LiveData<Boolean> getIsPortrait(){
+        return isPortrait;
+    }
+
+
+
+
+
+
 
     public void isMyServiceRunning() {
         Class<?> serviceClass = FloatingViewService.class;

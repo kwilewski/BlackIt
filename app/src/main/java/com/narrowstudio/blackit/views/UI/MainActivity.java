@@ -193,6 +193,8 @@ public class MainActivity extends AppCompatActivity {
         boolean isButtons = mSettingsViewModel.getIsButtonsEnabledBool();
         boolean isFloatingBoolean = mSettingsViewModel.getIsFloatingBoolean();
         int iconSize = mSettingsViewModel.getIconSizeInt();
+        boolean isRotation = mSettingsViewModel.getIsRotationBool();
+        boolean isPortrait = mSettingsViewModel.getIsPortraitBool();
         String knockCode = mKnockViewModel.getKnockCodeString();
         Intent intent = new Intent(MainActivity.this, FloatingViewService.class);
         intent.putExtra("unlock", unlockMode);
@@ -203,6 +205,8 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("floating", isFloatingBoolean);
         intent.putExtra("knock_code", knockCode);
         intent.putExtra("icon_size", iconSize);
+        intent.putExtra("rotation", isRotation);
+        intent.putExtra("portrait", isPortrait);
         this.startService(intent);
         //finish();
         this.moveTaskToBack(true);

@@ -75,5 +75,16 @@ public class SettingsModel {
         editor.apply();
     }
 
+    public void setRotation(boolean sett) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean("rotation", sett);
+        editor.apply();
+    }
+
+    public void setPortrait(boolean sett) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean("portrait", sett);
+        editor.apply();
+    }
 
 }
