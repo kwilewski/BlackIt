@@ -370,16 +370,6 @@ public class FloatingViewService extends Service {
             }
         }
 
-        if(!isFloating) {
-            if (!isRotation) {
-                if (isPortrait) {
-                    params.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-                } else {
-                    params.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED;
-                }
-            }
-        }
-
         params.gravity = Gravity.START | Gravity.TOP;
         if (isFloating) {
             params.x = prevX;
@@ -532,6 +522,13 @@ public class FloatingViewService extends Service {
                 params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE;
             }
         }
+        if (isRotation) {
+            if (isPortrait) {
+                params.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+            } else {
+                params.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED;
+            }
+        }
         if (viewExists) {
             floatingIcon.setVisibility(View.GONE);
             fullScreen.setVisibility(View.VISIBLE);
@@ -575,6 +572,7 @@ public class FloatingViewService extends Service {
         }
 
         params.flags = getParamsFlags();
+        params.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
         params.width = iconSizeDP;
         params.height = iconSizeDP;
         params.x = prevX;
