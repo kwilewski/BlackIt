@@ -33,6 +33,7 @@ import android.widget.TextClock;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -99,24 +100,34 @@ public class FloatingViewService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         createNotificationChannel();
+        PendingIntent pendingHomeIntent;
+        PendingIntent actionIntent;
+        PendingIntent actionKillIntent;
         Intent notificationHomeIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingHomeIntent = PendingIntent.getActivity(this,
-                0, notificationHomeIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-
         Intent broadcastIntent = new Intent(this, GoFSReceiver.class).setAction("fullscreen");
-        PendingIntent actionIntent = PendingIntent.getBroadcast(this,
-                0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
         Intent broadcastKillIntent = new Intent(this, GoFSReceiver.class).setAction("kill");
-        PendingIntent actionKillIntent = PendingIntent.getBroadcast(this,
-                0, broadcastKillIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) {
+            pendingHomeIntent = PendingIntent.getActivity(this,
+                    0, notificationHomeIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+            actionIntent = PendingIntent.getBroadcast(this,
+                    0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            actionKillIntent = PendingIntent.getBroadcast(this,
+                    0, broadcastKillIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        } else {
+            pendingHomeIntent = PendingIntent.getActivity(this,
+                    0, notificationHomeIntent, PendingIntent.FLAG_MUTABLE);
+            actionIntent = PendingIntent.getBroadcast(this,
+                    0, broadcastIntent, PendingIntent.FLAG_MUTABLE);
+            actionKillIntent = PendingIntent.getBroadcast(this,
+                    0, broadcastKillIntent, PendingIntent.FLAG_MUTABLE);
+        }
 
 
 
         Notification notification = new NotificationCompat.Builder(this, getResources().getString(R.string.service_channel))
                 .setContentText(getString(R.string.service_context))
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setNotificationSilent()
                 .setContentIntent(actionIntent)
                 .addAction(R.mipmap.ic_launcher, "Options", pendingHomeIntent)
                 .addAction(R.mipmap.ic_launcher, "Close", actionKillIntent)
@@ -144,12 +155,18 @@ public class FloatingViewService extends Service {
         return Service.START_STICKY;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     public void onCreate() {
         super.onCreate();
         mBlackScreen = LayoutInflater.from(this).inflate(R.layout.layout_floating_screen, null);
         IntentFilter filter = new IntentFilter("com.narrowstudio.blackit.FS_ACTION");
-        registerReceiver(mBroadcastReceiver, filter);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            registerReceiver(mBroadcastReceiver, filter, RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(mBroadcastReceiver, filter);
+        }
 
 
     }
@@ -655,6 +672,7 @@ public class FloatingViewService extends Service {
 
 
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getExtras().getString("actionname");

@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         mSettingsViewModel.isMyServiceRunning();
 
         if (!isServiceRunning.getValue()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(MainActivity.this)) {
+                if (!Settings.canDrawOverlays(MainActivity.this)) {
                     //If the draw over permission is not available open the settings screen
                     //to grant the permission.
                     Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
