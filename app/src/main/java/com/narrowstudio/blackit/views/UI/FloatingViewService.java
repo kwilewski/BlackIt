@@ -1,5 +1,8 @@
 package com.narrowstudio.blackit.views.UI;
 
+import static android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION;
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION;
+
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -12,6 +15,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.ServiceInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
@@ -125,16 +129,22 @@ public class FloatingViewService extends Service {
 
 
 
-        Notification notification = new NotificationCompat.Builder(this, getResources().getString(R.string.service_channel))
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(), getString(R.string.service_channel))
                 .setContentText(getString(R.string.service_context))
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentIntent(actionIntent)
-                .addAction(R.mipmap.ic_launcher, "Options", pendingHomeIntent)
+                .setChannelId(getString(R.string.service_channel))
+                .setContentIntent(pendingHomeIntent)
+                .addAction(R.mipmap.ic_launcher, "Activate", actionIntent)
                 .addAction(R.mipmap.ic_launcher, "Close", actionKillIntent)
-                .setShowWhen(false)
-                .build();
-        startForeground(1, notification);
+                .setShowWhen(false);
 
+
+
+        if (Build.VERSION.SDK_INT >= 34){
+            startForeground(1, notificationBuilder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+        } else {
+            startForeground(1, notificationBuilder.build());
+        }
 
         Bundle mBundle = intent.getExtras();
         unlockMode = mBundle.getInt("unlock", 0);

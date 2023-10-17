@@ -8,7 +8,7 @@
     <string name="settings_enable_buttons">Hide status and navigation bar</string>
     <string name="buttons_info">Note: newer Android phones does not support hiding status and navigation bar.</string>
     <string name="settings_brightness_buttons">Dim the screen</string>
-    <string name="service_context">Tap to activate</string>
+    <string name="service_context">Tap to open settings</string>
     <string name="service_channel">BlackItForegroundServiceChannel</string>
     <string name="select_unlock">Unlock method</string>
     <string-array name="select_unlock_array">
@@ -30,6 +30,7 @@
     <string name="knock_min_max">New Knock Pattern must be between 3 and 8 knocks</string>
     <string name="knock_code_set">New Knock Pattern set</string>
     <string name="allow_overlay">Black It needs a permission to be displayed over other apps.</string>
+    <string name="allow_notifications">Black It needs a permission to send notifications.</string>
     <string name="settings_lock_rotation">Lock rotation</string>
     <string name="settings_portrait_mode">Always lock in portrait</string>
 

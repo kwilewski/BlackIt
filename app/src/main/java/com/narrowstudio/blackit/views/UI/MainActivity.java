@@ -1,14 +1,21 @@
 package com.narrowstudio.blackit.views.UI;
 
+import static android.Manifest.permission.POST_NOTIFICATIONS;
+import static android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -157,14 +164,26 @@ public class MainActivity extends AppCompatActivity {
         mSettingsViewModel.isMyServiceRunning();
 
         if (!isServiceRunning.getValue()) {
-                if (!Settings.canDrawOverlays(MainActivity.this)) {
-                    //If the draw over permission is not available open the settings screen
-                    //to grant the permission.
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                            Uri.parse("package:" + getPackageName()));
-                    startActivityForResult(intent, CODE_DRAW_OVER_OTHER_APP_PERMISSION);
-                    Toast toast = Toast.makeText(this, getResources().getString(R.string.allow_overlay), Toast.LENGTH_LONG);
-                    toast.show();
+            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                if (!Settings.canDrawOverlays(MainActivity.this) || !manager.areNotificationsEnabled()) {
+                    if (!Settings.canDrawOverlays(MainActivity.this)) {
+                        //If the draw over permission is not available open the settings screen
+                        //to grant the permission.
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                Uri.parse("package:" + getPackageName()));
+                        startActivityForResult(intent, CODE_DRAW_OVER_OTHER_APP_PERMISSION);
+                        Toast toast = Toast.makeText(this, getResources().getString(R.string.allow_overlay), Toast.LENGTH_LONG);
+                        toast.show();
+                    }
+                    else if (!manager.areNotificationsEnabled()){
+                        if (Build.VERSION.SDK_INT >= 33) {
+                            if (ContextCompat.checkSelfPermission(this, POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED) {
+                                ActivityCompat.requestPermissions(this, new String[]{POST_NOTIFICATIONS}, 1);
+                            }
+                        }
+                        Toast toast = Toast.makeText(this, getResources().getString(R.string.allow_notifications), Toast.LENGTH_LONG);
+                        toast.show();
+                    }
                 } else {
                     //start service
                     initializeView();
