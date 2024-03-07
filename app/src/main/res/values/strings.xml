@@ -34,6 +34,9 @@
     <string name="settings_lock_rotation">Lock rotation</string>
     <string name="settings_portrait_mode">Always lock in portrait</string>
 
+    <string name="activate">Activate</string>
+    <string name="close">Close</string>
+
 
 
 

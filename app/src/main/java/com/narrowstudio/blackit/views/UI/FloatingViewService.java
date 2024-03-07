@@ -48,6 +48,7 @@ import com.narrowstudio.blackit.viewmodels.SettingsViewModel;
 import com.narrowstudio.blackit.views.broadcast.GoFSReceiver;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class FloatingViewService extends Service {
 
@@ -108,8 +109,9 @@ public class FloatingViewService extends Service {
         PendingIntent actionIntent;
         PendingIntent actionKillIntent;
         Intent notificationHomeIntent = new Intent(this, MainActivity.class);
-        Intent broadcastIntent = new Intent(this, GoFSReceiver.class).setAction("fullscreen");
-        Intent broadcastKillIntent = new Intent(this, GoFSReceiver.class).setAction("kill");
+        Intent broadcastIntent = new Intent(this, GoFSReceiver.class).setAction("com.narrowstudio.blackit.fullscreen");
+        Intent broadcastKillIntent = new Intent(this, GoFSReceiver.class).setAction("com.narrowstudio.blackit.kill");
+
 
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) {
             pendingHomeIntent = PendingIntent.getActivity(this,
@@ -129,13 +131,14 @@ public class FloatingViewService extends Service {
 
 
 
+
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(), getString(R.string.service_channel))
                 .setContentText(getString(R.string.service_context))
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setChannelId(getString(R.string.service_channel))
                 .setContentIntent(pendingHomeIntent)
-                .addAction(R.mipmap.ic_launcher, "Activate", actionIntent)
-                .addAction(R.mipmap.ic_launcher, "Close", actionKillIntent)
+                .addAction(R.mipmap.ic_launcher, getString(R.string.activate), actionIntent)
+                .addAction(R.mipmap.ic_launcher, getString(R.string.close), actionKillIntent)
                 .setShowWhen(false);
 
 
@@ -147,6 +150,7 @@ public class FloatingViewService extends Service {
         }
 
         Bundle mBundle = intent.getExtras();
+        assert mBundle != null;
         unlockMode = mBundle.getInt("unlock", 0);
         screenMode = mBundle.getInt("screen");
         isClock = mBundle.getBoolean("clock", true);
@@ -172,11 +176,9 @@ public class FloatingViewService extends Service {
         mBlackScreen = LayoutInflater.from(this).inflate(R.layout.layout_floating_screen, null);
         IntentFilter filter = new IntentFilter("com.narrowstudio.blackit.FS_ACTION");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            registerReceiver(mBroadcastReceiver, filter, RECEIVER_NOT_EXPORTED);
-        } else {
-            registerReceiver(mBroadcastReceiver, filter);
-        }
+
+        // RECEIVER_EXPORTED works on API 34+
+        registerReceiver(mBroadcastReceiver, filter, RECEIVER_EXPORTED);
 
 
     }
@@ -685,12 +687,12 @@ public class FloatingViewService extends Service {
         @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getExtras().getString("actionname");
-            switch (action) {
-                case "fullscreen":
+            String action = Objects.requireNonNull(intent.getExtras()).getString("actionname");
+            switch (Objects.requireNonNull(action)) {
+                case "com.narrowstudio.blackit.fullscreen":
                     goFullScreen();
                     break;
-                case "kill":
+                case "com.narrowstudio.blackit.kill":
                     killService();
                     break;
             }
