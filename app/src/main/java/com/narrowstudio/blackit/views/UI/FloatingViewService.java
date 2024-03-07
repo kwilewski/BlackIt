@@ -55,9 +55,9 @@ public class FloatingViewService extends Service {
     private WindowManager mWindowManager;
     final WindowManager.LayoutParams params = show();
     private int unlockMode = 0, screenMode = 0, clicked = 0, floatingSize = 0, iconSize = 0;
-    private int doubleClickTime = 500, knockClickTime = 500;
+    private final int doubleClickTime = 500, knockClickTime = 500;
     private ArrayList<Integer> knockCode = new ArrayList<>();
-    private ArrayList<Integer> knockSeq = new ArrayList<>();
+    private final ArrayList<Integer> knockSeq = new ArrayList<>();
     private boolean wasBoxClicked = false;
     private long startTime = 0,millis;
     private int millisSet=500;
@@ -113,7 +113,7 @@ public class FloatingViewService extends Service {
 
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) {
             pendingHomeIntent = PendingIntent.getActivity(this,
-                    0, notificationHomeIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    0, notificationHomeIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             actionIntent = PendingIntent.getBroadcast(this,
                     0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             actionKillIntent = PendingIntent.getBroadcast(this,
